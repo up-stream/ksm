@@ -181,6 +181,6 @@ const (
 
 const (
 	//Offline
-	contentKeyPersisted            = 0x3df2d9fb //Content key can be persisted with unlimited validity duration
-	contentKeyPersistedWithlimited = 0x18f06048 //Content key can be persisted, and it’s validity duration is limited to the “Rental Duration” value
+	ContentKeyPersisted            = 0x3df2d9fb //Content key can be persisted with unlimited validity duration
+	ContentKeyPersistedWithlimited = 0x18f06048 //Content key can be persisted, and it’s validity duration is limited to the “Rental Duration” value
 )
