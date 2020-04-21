@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/easonlin404/ksm/d"
+	"github.com/up-stream/ksm/d"
 	"github.com/stretchr/testify/assert"
 )
 
