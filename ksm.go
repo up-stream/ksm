@@ -2,16 +2,18 @@ package ksm
 
 import (
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/x509"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/easonlin404/ksm/crypto/aes"
-	"github.com/easonlin404/ksm/crypto/rsa"
 	"github.com/easonlin404/ksm/d"
 )
 
@@ -239,7 +241,6 @@ func generateRandomIv() CkcDataIv {
 	return CkcDataIv{
 		IV: key,
 	}
-
 }
 
 func encryptCkcPayload(encryptedArSeed []byte, iv CkcDataIv, ckcPayload []byte) (*CkcEncryptedPayload, error) {
@@ -471,7 +472,17 @@ func decryptSPCK(pub, pri string, enSpck []byte) ([]byte, error) {
 	if len(enSpck) != 128 {
 		return nil, errors.New("Wrong [SPCK] length, must be 128")
 	}
-	spck, err := rsa.OAEPPDecrypt(pub, pri, enSpck)
+
+	hash := sha1.New()
+	random := rand.Reader
+	privateKeyBlock, _ := pem.Decode([]byte(pri))
+	var pKey *rsa.PrivateKey
+	pKey, parseErr := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
+	if parseErr != nil {
+		fmt.Println("Load private key error")
+		panic(parseErr)
+	}
+	spck, err := rsa.DecryptOAEP(hash, random, pKey, enSpck, nil)
 
 	if err != nil {
 		// create a slice for the errors

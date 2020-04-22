@@ -1,17 +1,27 @@
 package aes
 
 import (
-	"github.com/89hmdys/toast/cipher"
-	"github.com/89hmdys/toast/crypto"
+	"crypto/aes"
+	"errors"
 )
 
 func EncryptWithECB(key []byte, plainText []byte) ([]byte, error) {
-	mode := cipher.NewECBMode()
-	cipher, err := crypto.NewAESWith(key, mode)
+	blockSize := aes.BlockSize
+	c, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
+	if len(plainText)%blockSize != 0 {
+		return nil, errors.New("crypto/cipher: input not full blocks")
+	}
 
-	ciphertext := cipher.Encrypt(plainText)
-	return ciphertext, nil
+	encrypted := make([]byte, len(plainText))
+	dst := encrypted
+	for len(plainText) > 0 {
+		c.Encrypt(dst, plainText[:blockSize])
+		plainText = plainText[blockSize:]
+		dst = dst[blockSize:]
+	}
+
+	return encrypted, nil
 }
