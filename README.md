@@ -1,9 +1,9 @@
 # ksm
 
-[![Build Status](https://travis-ci.org/up-stream/ksm.svg)](https://travis-ci.org/up-stream/ksm)
-[![codecov](https://codecov.io/gh/up-stream/ksm/branch/master/graph/badge.svg)](https://codecov.io/gh/up-stream/ksm)
-[![Go Report Card](https://goreportcard.com/badge/github.com/up-stream/ksm)](https://goreportcard.com/report/github.com/up-stream/ksm)
-[![GoDoc](https://godoc.org/github.com/up-stream/ksm?status.svg)](https://godoc.org/github.com/up-stream/ksm)
+[![Build Status](https://travis-ci.org/easonlin404/ksm.svg)](https://travis-ci.org/easonlin404/ksm)
+[![codecov](https://codecov.io/gh/easonlin404/ksm/branch/master/graph/badge.svg)](https://codecov.io/gh/easonlin404/ksm)
+[![Go Report Card](https://goreportcard.com/badge/github.com/easonlin404/ksm)](https://goreportcard.com/report/github.com/easonlin404/ksm)
+[![GoDoc](https://godoc.org/github.com/easonlin404/ksm?status.svg)](https://godoc.org/github.com/easonlin404/ksm)
 
 
 Apple FairPlay Streaming ([FPS](https://developer.apple.com/streaming/fps/)) securely delivers keys to Apple mobile devices, Apple TV, and Safari on OS X, which will enable playback of encrypted video content. 
@@ -17,7 +17,7 @@ This project is FairPlay Streaming Key Security Module written in Go (Golang).
 Download and install it:
 
 ```bash
-$ go get github.com/up-stream/ksm
+$ go get github.com/easonlin404/ksm
 ```
 
 ### Verify ckc
@@ -39,8 +39,8 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/up-stream/ksm"
-	"github.com/up-stream/ksm/d"
+	"github.com/easonlin404/ksm"
+	"github.com/easonlin404/ksm/d"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
@@ -117,10 +117,10 @@ func (RandomContentKey) FetchContentKeyDuration(assetId []byte) (*ksm.CkcContent
 }
 ```
 
-
+## FAQ
 ### How to send sample SPC data?
 
-Our [example/basic.go](https://github.com/up-stream/ksm/blob/master/example/basic.go) router has to accepted SPC parameter that is base64 encoding. And [testdata/spc1.bin](https://github.com/up-stream/ksm/blob/master/testdata/FPS/spc1.bin) is binary file, so you have to encode to base64  string.
+Our [example/basic.go](https://github.com/easonlin404/ksm/blob/master/example/basic.go) router has to accepted SPC parameter that is base64 encoding. And [testdata/spc1.bin](https://github.com/easonlin404/ksm/blob/master/testdata/FPS/spc1.bin) is binary file, so you have to encode to base64  string.
 
 
 After run as local server, you can test sample POST request using [httpie](https://httpie.org/) tool(spc is spc1.bin base64 encoding):
@@ -143,4 +143,8 @@ Date: Thu, 08 Mar 2018 05:51:02 GMT
 ```
 
 
+### How to verifying Key Security Module (KSM) Implementation?
+[https://developer.apple.com/library/archive/technotes/tn2454/_index.html#//apple_ref/doc/uid/DTS40017630-CH1-VERIFYING_KEY_SECURITY_MODULE__KSM__IMPLEMENTATION](https://developer.apple.com/library/archive/technotes/tn2454/_index.html#//apple_ref/doc/uid/DTS40017630-CH1-VERIFYING_KEY_SECURITY_MODULE__KSM__IMPLEMENTATION)
 
+### How to Debugging FairPlay Streaming?
+[https://developer.apple.com/library/archive/technotes/tn2454/_index.html](https://developer.apple.com/library/archive/technotes/tn2454/_index.html)
