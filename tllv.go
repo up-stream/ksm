@@ -110,14 +110,13 @@ type CkcContentKeyDurationBlock struct {
 
 	LeaseDuration  uint32 // 16-19, The duration of the lease, if any, in seconds.
 	RentalDuration uint32 // 20-23, The duration of the rental, if any, in seconds.
-	KeyType        uint32 // 24-27,The key type.
 	//Reserved       uint32 // Reserved; set to a fixed value of 0x86d34a3a.
 	//Padding        []byte // Random values to fill out the TLLV to a multiple of 16 bytes.
 
 }
 
 // NewCkcContentKeyDurationBlock creates a new a ckc content key duration block object using the specified lease duration and rental duration.
-func NewCkcContentKeyDurationBlock(LeaseDuration, RentalDuration uint32) *CkcContentKeyDurationBlock {
+func NewCkcContentKeyDurationBlock(LeaseDuration uint32, RentalDuration uint32, keyType uint32) *CkcContentKeyDurationBlock {
 	var value []byte
 
 	LeaseDurationOut := make([]byte, 4)
@@ -128,8 +127,7 @@ func NewCkcContentKeyDurationBlock(LeaseDuration, RentalDuration uint32) *CkcCon
 
 	keyTypeOut := make([]byte, 4)
 
-	//binary.BigEndian.PutUint32(keyTypeOut, contentKeyValidForLease)
-	binary.BigEndian.PutUint32(keyTypeOut, contentKeyPersisted)
+	binary.BigEndian.PutUint32(keyTypeOut, keyType)
 
 	value = append(value, LeaseDurationOut...)
 	value = append(value, rentalDurationOut...)
@@ -142,7 +140,6 @@ func NewCkcContentKeyDurationBlock(LeaseDuration, RentalDuration uint32) *CkcCon
 		TLLVBlock:      tllv,
 		LeaseDuration:  LeaseDuration,
 		RentalDuration: RentalDuration,
-		KeyType:        contentKeyValidForLease, //TODO: KeyType does not use
 	}
 }
 
@@ -184,6 +181,6 @@ const (
 
 const (
 	//Offline
-	contentKeyPersisted            = 0x3df2d9fb //Content key can be persisted with unlimited validity duration
-	contentKeyPersistedWithlimited = 0x18f06048 //Content key can be persisted, and it’s validity duration is limited to the “Rental Duration” value
+	ContentKeyPersisted            = 0x3df2d9fb //Content key can be persisted with unlimited validity duration
+	ContentKeyPersistedWithlimited = 0x18f06048 //Content key can be persisted, and it’s validity duration is limited to the “Rental Duration” value
 )
