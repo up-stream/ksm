@@ -7,8 +7,8 @@ import (
 
 // ContentKey is a interface that fetch asset content key and duration.
 type ContentKey interface {
-	FetchContentKey(assetID []byte) ([]byte, []byte, error)
-	FetchContentKeyDuration(assetID []byte) (*CkcContentKeyDurationBlock, error)
+	FetchContentKey(spc *SPCContainer, assetID []byte) ([]byte, []byte, error)
+	FetchContentKeyDuration(spc *SPCContainer, assetID []byte) (*CkcContentKeyDurationBlock, error)
 }
 
 var (
@@ -20,7 +20,7 @@ type RandomContentKey struct {
 }
 
 // FetchContentKey returns content key and iv for the given assetId.
-func (RandomContentKey) FetchContentKey(assetID []byte) ([]byte, []byte, error) {
+func (RandomContentKey) FetchContentKey(spc *SPCContainer, assetID []byte) ([]byte, []byte, error) {
 	key := make([]byte, 16)
 	iv := make([]byte, 16)
 	rand.Read(key)
@@ -29,7 +29,7 @@ func (RandomContentKey) FetchContentKey(assetID []byte) ([]byte, []byte, error) 
 }
 
 // FetchContentKeyDuration returns CkcContentKeyDurationBlock for the given assetId.
-func (RandomContentKey) FetchContentKeyDuration(assetID []byte) (*CkcContentKeyDurationBlock, error) {
+func (RandomContentKey) FetchContentKeyDuration(spc *SPCContainer, assetID []byte) (*CkcContentKeyDurationBlock, error) {
 
 	LeaseDuration := mathRand.Uint32()  // The duration of the lease, if any, in seconds.
 	RentalDuration := mathRand.Uint32() // The duration of the rental, if any, in seconds.
