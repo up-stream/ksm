@@ -120,7 +120,7 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 	fmt.Printf("assetID: %v\n", hex.EncodeToString(assetID))
 	fmt.Printf("assetID(string): %v\n", string(assetID))
 
-	enCk, contentIv, err := encryptCK(assetTTlv.Value, k.Rck, DecryptedSKR1Payload.SK)
+	enCk, contentIv, err := encryptCK(spcv1, assetTTlv.Value, k.Rck, DecryptedSKR1Payload.SK)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 
 	//ContenKeyDurationTllv,  This TLLV may be present only if the KSM has received an SPC with a Media Playback State TLLV.
 	if _, ok := ttlvs[tagMediaPlaybackState]; ok {
-		ckcDuraionTllv, err := genCkDurationTllv(assetID, k.Rck)
+		ckcDuraionTllv, err := genCkDurationTllv(spcv1, assetID, k.Rck)
 		if err != nil {
 			return nil, err
 		}
@@ -161,8 +161,8 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 	return out, nil
 }
 
-func genCkDurationTllv(assetID []byte, key ContentKey) ([]byte, error) {
-	CkcContentKeyDurationBlock, err := key.FetchContentKeyDuration(assetID)
+func genCkDurationTllv(spc *SPCContainer, assetID []byte, key ContentKey) ([]byte, error) {
+	CkcContentKeyDurationBlock, err := key.FetchContentKeyDuration(spc, assetID)
 	if err != nil {
 		return nil, err
 	}
@@ -273,8 +273,8 @@ func findReturnRequestBlocks(spcv1 *SPCContainer) []TLLVBlock {
 	return returnTllvs
 }
 
-func encryptCK(assetID []byte, ck ContentKey, sk []byte) ([]byte, []byte, error) {
-	contentKey, contentIv, err := ck.FetchContentKey(assetID)
+func encryptCK(spc *SPCContainer, assetID []byte, ck ContentKey, sk []byte) ([]byte, []byte, error) {
+	contentKey, contentIv, err := ck.FetchContentKey(spc, assetID)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -66,7 +66,7 @@ type RandomContentKey struct {
 }
 
 // Implement FetchContentKey func
-func (RandomContentKey) FetchContentKey(assetId []byte) ([]byte, []byte, error) {
+func (RandomContentKey) FetchContentKey(spc *ksm.SPCContainer, assetId []byte) ([]byte, []byte, error) {
 	key := make([]byte, 16)
 	iv := make([]byte, 16)
 	rand.Read(key)
@@ -75,12 +75,12 @@ func (RandomContentKey) FetchContentKey(assetId []byte) ([]byte, []byte, error) 
 }
 
 // Implement FetchContentKeyDuration func
-func (RandomContentKey) FetchContentKeyDuration(assetId []byte) (*ksm.CkcContentKeyDurationBlock, error) {
+func (RandomContentKey) FetchContentKeyDuration(spc *ksm.SPCContainer, assetId []byte) (*ksm.CkcContentKeyDurationBlock, error) {
 
 	LeaseDuration := rand.Uint32()  // The duration of the lease, if any, in seconds.
 	RentalDuration := rand.Uint32() // The duration of the rental, if any, in seconds.
 
-	return ksm.NewCkcContentKeyDurationBlock(LeaseDuration, RentalDuration), nil
+	return ksm.NewCkcContentKeyDurationBlock(LeaseDuration, RentalDuration, ksm.ContentKeyPersisted), nil
 }
 
 var pub = `-----BEGIN CERTIFICATE-----
