@@ -134,7 +134,7 @@ func NewCkcContentKeyDurationBlock(LeaseDuration uint32, RentalDuration uint32, 
 	value = append(value, keyTypeOut...)
 	value = append(value, []byte{0x86, 0xd3, 0x4a, 0x3a}...) //Reserved; set to a fixed value of 0x86d34a3a.
 
-	tllv := NewTLLVBlock(tagContentKeyDuration, value)
+	tllv := NewTLLVBlock(TagContentKeyDuration, value)
 
 	return &CkcContentKeyDurationBlock{
 		TLLVBlock:      tllv,
@@ -144,39 +144,39 @@ func NewCkcContentKeyDurationBlock(LeaseDuration uint32, RentalDuration uint32, 
 }
 
 const (
-	tagSessionKeyR1              = 0x3d1a10b8bffac2ec
-	tagSessionKeyR1Integrity     = 0xb349d4809e910687
-	tagAntiReplaySeed            = 0x89c90f12204106b2
-	tagR2                        = 0x71b5595ac1521133
-	tagReturnRequest             = 0x19f9d4e5ab7609cb
-	tagAssetID                   = 0x1bf7f53f5d5d5a1f
-	tagTransactionID             = 0x47aa7ad3440577de
-	tagProtocolVersionsSupported = 0x67b8fb79ecce1a13
-	tagProtocolVersionUsed       = 0x5d81bcbcc7f61703
-	tagTreamingIndicator         = 0xabb0256a31843974
-	tagMediaPlaybackState        = 0xeb8efdf2b25ab3a0
+	TagSessionKeyR1              = 0x3d1a10b8bffac2ec
+	TagSessionKeyR1Integrity     = 0xb349d4809e910687
+	TagAntiReplaySeed            = 0x89c90f12204106b2
+	TagR2                        = 0x71b5595ac1521133
+	TagReturnRequest             = 0x19f9d4e5ab7609cb
+	TagAssetID                   = 0x1bf7f53f5d5d5a1f
+	TagTransactionID             = 0x47aa7ad3440577de
+	TagProtocolVersionsSupported = 0x67b8fb79ecce1a13
+	TagProtocolVersionUsed       = 0x5d81bcbcc7f61703
+	TagTreamingIndicator         = 0xabb0256a31843974
+	TagMediaPlaybackState        = 0xeb8efdf2b25ab3a0
 
-	playbackStateReadyToStart    = 0xf4dee5a2
-	playbackStatePlayingOrPaused = 0xa5d6739e
-	playbackStatePlaying         = 0x4f834330
-	playbackStateHalted          = 0x5991bf20
+	PlaybackStateReadyToStart    = 0xf4dee5a2
+	PlaybackStatePlayingOrPaused = 0xa5d6739e
+	PlaybackStatePlaying         = 0x4f834330
+	PlaybackStateHalted          = 0x5991bf20
 )
 
 const (
-	fieldTagLength   = 8
-	fieldBlockLength = 4
-	fieldValueLength = 4
+	FieldTagLength   = 8
+	FieldBlockLength = 4
+	FieldValueLength = 4
 )
 
 const (
-	tagEncryptedCk        = 0x58b38165af0e3d5a
-	tagR1                 = 0xea74c4645d5efee9
-	tagContentKeyDuration = 0x47acf6a418cd091a
-	tagHdcpEnforcement    = 0x2e52f1530d8ddb4a
+	TagEncryptedCk        = 0x58b38165af0e3d5a
+	TagR1                 = 0xea74c4645d5efee9
+	TagContentKeyDuration = 0x47acf6a418cd091a
+	TagHdcpEnforcement    = 0x2e52f1530d8ddb4a
 
-	contentKeyValidForLease  = 0x1a4bde7e //Content key valid for lease only
-	contentKeyValidForRental = 0x3dfe45a0 //Content key valid for rental only
-	contentKeyValidForBoth   = 0x27b59bde //Content key valid for both lease and rental
+	ContentKeyValidForLease  = 0x1a4bde7e //Content key valid for lease only
+	ContentKeyValidForRental = 0x3dfe45a0 //Content key valid for rental only
+	ContentKeyValidForBoth   = 0x27b59bde //Content key valid for both lease and rental
 )
 
 const (
