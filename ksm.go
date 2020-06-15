@@ -77,7 +77,7 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 	}
 
 	ttlvs := spcv1.TTLVS
-	skr1 := parseSKR1(ttlvs[tagSessionKeyR1])
+	skr1 := ParseSKR1(ttlvs[tagSessionKeyR1])
 
 	r2 := ttlvs[tagR2]
 	dask, err := k.DFunction.Compute(r2.Value, k.Ask)
@@ -86,7 +86,7 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	DecryptedSKR1Payload, err := decryptSKR1Payload(*skr1, dask)
+	decryptedSKR1Payload, err := DecryptSKR1Payload(*skr1, dask)
 	if err != nil {
 		return nil, err
 	}
@@ -100,14 +100,14 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 
 	fmt.Printf("checkTheIntegrity: %s\n", hex.EncodeToString(checkTheIntegrity.Value))
 
-	if !reflect.DeepEqual(checkTheIntegrity.Value, DecryptedSKR1Payload.IntegrityBytes) {
+	if !reflect.DeepEqual(checkTheIntegrity.Value, decryptedSKR1Payload.IntegrityBytes) {
 		return nil, errors.New("check the integrity of the SPC failed")
 	}
 
 	fmt.Printf("DASk Value:\n\t%s\n\n", hex.EncodeToString(dask))
-	fmt.Printf("SPC SK Value:\n\t%s\n\n", hex.EncodeToString(DecryptedSKR1Payload.SK))
+	fmt.Printf("SPC SK Value:\n\t%s\n\n", hex.EncodeToString(decryptedSKR1Payload.SK))
 	fmt.Printf("SPC [SK..R1] IV Value:\n\t%s\n\n", hex.EncodeToString(skr1.IV))
-	//fmt.Printf("SPC R1 Value:\n%s\n\n",hex.EncodeToString(DecryptedSKR1Payload.R1))
+	//fmt.Printf("SPC R1 Value:\n%s\n\n",hex.EncodeToString(decryptedSKR1Payload.R1))
 
 	assetTTlv := ttlvs[tagAssetID]
 
@@ -120,31 +120,31 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 	fmt.Printf("assetID: %v\n", hex.EncodeToString(assetID))
 	fmt.Printf("assetID(string): %v\n", string(assetID))
 
-	enCk, contentIv, err := encryptCK(assetTTlv.Value, k.Rck, DecryptedSKR1Payload.SK)
+	enCk, contentIv, err := encryptCK(assetTTlv.Value, k.Rck, decryptedSKR1Payload.SK)
 	if err != nil {
 		return nil, err
 	}
 
-	returnTllvs := findReturnRequestBlocks(spcv1)
+	returnTllvs := FindReturnRequestBlocks(spcv1)
 
-	ckcDataIv := generateRandomIv()
+	ckcDataIv := GenerateRandomIv()
 	ckcR1 := CkcR1{
-		R1: DecryptedSKR1Payload.R1,
+		R1: decryptedSKR1Payload.R1,
 	}
 
-	encryptedArSeed, err := getEncryptedArSeed(DecryptedSKR1Payload.R1, ttlvs[tagAntiReplaySeed].Value)
+	encryptedArSeed, err := GetEncryptedArSeed(decryptedSKR1Payload.R1, ttlvs[tagAntiReplaySeed].Value)
 	if err != nil {
 		return nil, err
 	}
 
-	ckcPayload, err := genCkcPayload(contentIv, enCk, ckcR1, returnTllvs)
+	ckcPayload, err := GenCkcPayload(contentIv, enCk, ckcR1, returnTllvs)
 	if err != nil {
 		return nil, err
 	}
 
 	//ContenKeyDurationTllv,  This TLLV may be present only if the KSM has received an SPC with a Media Playback State TLLV.
 	if _, ok := ttlvs[tagMediaPlaybackState]; ok {
-		ckcDuraionTllv, err := genCkDurationTllv(assetID, k.Rck)
+		ckcDuraionTllv, err := GenCkDurationTllv(assetID, k.Rck)
 		if err != nil {
 			return nil, err
 		}
@@ -152,16 +152,16 @@ func (k *Ksm) GenCKC(playback []byte) ([]byte, error) {
 		ckcPayload = append(ckcPayload, ckcDuraionTllv...)
 	}
 
-	enCkcPayload, err := encryptCkcPayload(encryptedArSeed, ckcDataIv, ckcPayload)
+	enCkcPayload, err := EncryptCkcPayload(encryptedArSeed, ckcDataIv, ckcPayload)
 	if err != nil {
 		return nil, err
 	}
 
-	out := fillCKCContainer(enCkcPayload.Payload, ckcDataIv)
+	out := FillCKCContainer(enCkcPayload.Payload, ckcDataIv)
 	return out, nil
 }
 
-func genCkDurationTllv(assetID []byte, key ContentKey) ([]byte, error) {
+func GenCkDurationTllv(assetID []byte, key ContentKey) ([]byte, error) {
 	CkcContentKeyDurationBlock, err := key.FetchContentKeyDuration(assetID)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ func DebugCKC(ckcplayback []byte) {
 	ckcContaniner.CKCPayload = ckcplayback[28 : 28+ckcContaniner.CKCPayloadLength]
 }
 
-func genCkcPayload(ckIv, enCk []byte, ckcR1 CkcR1, returnTllvs []TLLVBlock) ([]byte, error) {
+func GenCkcPayload(ckIv, enCk []byte, ckcR1 CkcR1, returnTllvs []TLLVBlock) ([]byte, error) {
 	//TODO: The order of these blocks should be random.
 	var ckcPayload []byte
 
@@ -226,7 +226,7 @@ func genCkcPayload(ckIv, enCk []byte, ckcR1 CkcR1, returnTllvs []TLLVBlock) ([]b
 
 }
 
-func getEncryptedArSeed(r1 []byte, arSeed []byte) ([]byte, error) {
+func GetEncryptedArSeed(r1 []byte, arSeed []byte) ([]byte, error) {
 	h := sha1.New()
 	h.Write(r1)
 	arKey := h.Sum(nil)[0:16]
@@ -234,7 +234,7 @@ func getEncryptedArSeed(r1 []byte, arSeed []byte) ([]byte, error) {
 	return aes.EncryptWithECB(arKey, arSeed)
 }
 
-func generateRandomIv() CkcDataIv {
+func GenerateRandomIv() CkcDataIv {
 	key := make([]byte, 16)
 	rand.Read(key)
 
@@ -243,7 +243,7 @@ func generateRandomIv() CkcDataIv {
 	}
 }
 
-func encryptCkcPayload(encryptedArSeed []byte, iv CkcDataIv, ckcPayload []byte) (*CkcEncryptedPayload, error) {
+func EncryptCkcPayload(encryptedArSeed []byte, iv CkcDataIv, ckcPayload []byte) (*CkcEncryptedPayload, error) {
 	encryped, err := aes.Encrypt(encryptedArSeed, iv.IV, ckcPayload)
 	if err != nil {
 		return nil, err
@@ -251,7 +251,7 @@ func encryptCkcPayload(encryptedArSeed []byte, iv CkcDataIv, ckcPayload []byte) 
 	return &CkcEncryptedPayload{Payload: encryped}, nil
 }
 
-func findReturnRequestBlocks(spcv1 *SPCContainer) []TLLVBlock {
+func FindReturnRequestBlocks(spcv1 *SPCContainer) []TLLVBlock {
 	tagReturnReq := spcv1.TTLVS[tagReturnRequest]
 
 	var returnTllvs []TLLVBlock
@@ -321,7 +321,7 @@ func parseSPCContainer(playback []byte) *SPCContainer {
 	return spcContainer
 }
 
-func fillCKCContainer(CkcEncryptedPayload []byte, iv CkcDataIv) []byte {
+func FillCKCContainer(CkcEncryptedPayload []byte, iv CkcDataIv) []byte {
 	ckcContaniner := CKCContainer{
 		CKCVersion:   0x00000001,
 		Reserved:     []byte{0x00, 0x00, 0x00, 0x00},
@@ -422,7 +422,7 @@ func parseTLLVs(spcpayload []byte) map[uint64]TLLVBlock {
 	return m
 }
 
-func parseSKR1(tllv TLLVBlock) *SKR1TLLVBlock {
+func ParseSKR1(tllv TLLVBlock) *SKR1TLLVBlock {
 	return &SKR1TLLVBlock{
 		TLLVBlock: tllv,
 		IV:        tllv.Value[0:16],
@@ -430,7 +430,7 @@ func parseSKR1(tllv TLLVBlock) *SKR1TLLVBlock {
 	}
 }
 
-func decryptSKR1Payload(skr1 SKR1TLLVBlock, dask []byte) (*DecryptedSKR1Payload, error) {
+func DecryptSKR1Payload(skr1 SKR1TLLVBlock, dask []byte) (*DecryptedSKR1Payload, error) {
 	if skr1.Tag != tagSessionKeyR1 {
 		return nil, errors.New("decryptSKR1 doesn't match tagSessionKeyR1 tag")
 	}
